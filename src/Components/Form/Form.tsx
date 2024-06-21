@@ -15,7 +15,7 @@ function Form() {
   } = useForm();
 
   return (
-    <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
+    <form className="flex flex-col gap-3">
       <div className="flex flex-col">
         <label className="text-sm" htmlFor="name">
           Nome:
@@ -67,7 +67,7 @@ function Form() {
 
       <Button
         className="bg-slate-600 hover:bg-slate-800 font-medium text-sm py-2 px-4 rounded-lg text-white"
-        type="submit"
+        onClick={handleSubmit}
       >
         Cadastrar
       </Button>
