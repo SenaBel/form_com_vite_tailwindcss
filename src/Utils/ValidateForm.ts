@@ -1,19 +1,18 @@
-import { IUser, IValidateForm } from "../Interfaces";
+import { IFieldConfig, IFormData, IValidateForm } from "../Interfaces";
 
-export const ValidateForm = (data: IUser) => {
+export const ValidateForm = (
+  data: IFormData,
+  fields: IFieldConfig[]
+): IValidateForm => {
   const errors: IValidateForm = {};
 
-  if (!data.name) {
-    errors["name"] = "O nome é obrigatório.";
-  }
+  console.log("field", fields);
 
-  if (!data.email) {
-    errors["email"] = "O email é obrigatório.";
-  }
-
-  if (!data.agree) {
-    errors["agree"] = "Você precisa concordar com os termos";
-  }
+  fields.forEach((field) => {
+    if (field.isRequired && !data[field.id]) {
+      errors[field.id] = `O campo ${field.label} é obrigatório.`;
+    }
+  });
 
   return errors;
 };

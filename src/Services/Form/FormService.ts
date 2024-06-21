@@ -4,6 +4,7 @@ const API_URL = "https://jsonplaceholder.typicode.com/posts";
 
 class FormService {
   async addForm(data: IUser) {
+    if (!data) return;
     console.log("data no service", data);
     try {
       const response = await fetch(API_URL, {
@@ -18,7 +19,7 @@ class FormService {
         ("");
         throw new Error(`Erro: ${response.status}`);
       }
-
+      e;
       const result = await response.json();
       return result;
     } catch (error) {

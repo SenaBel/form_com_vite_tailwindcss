@@ -1,65 +1,57 @@
-import { FormEvent, useState } from "react";
-import { IUser } from "../../Interfaces";
-import FormService from "../../Services/Form/FormService";
+import { useState } from "react";
+import { IFieldConfig, IFormData } from "../../Interfaces";
 import { ValidateForm } from "../../Utils/ValidateForm";
 
-function useForm() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [agree, setAgree] = useState(false);
+interface IUseForm {
+  formData: IFormData;
+  errors: { [key: string]: string };
+  response: IFormData | null;
+  handleChange: (id: string, value: string | boolean) => void;
+  handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+}
 
-  const [errors, setErrors] = useState<IUser | null>(null);
+const useForm = (
+  fields: IFieldConfig[],
+  onSubmit: (formData: IFormData) => void
+): IUseForm => {
+  const initialFormData: IFormData = {};
+  fields.forEach((field) => {
+    initialFormData[field.id] = field.initialValue;
+  });
 
-  const [response, setResponse] = useState<IUser | null>(null);
+  const [formData, setFormData] = useState<IFormData>(initialFormData);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [response, setResponse] = useState<IFormData | null>(null);
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleChange = (id: string, value: string | boolean) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [id]: value,
+    }));
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    setErrors(null);
-
-    const data: IUser = {
-      name,
-      email,
-      agree,
-    };
-
-    const validateErrors = ValidateForm(data);
+    onSubmit(formData);
+    const validateErrors = ValidateForm(formData, fields);
 
     if (Object.keys(validateErrors).length > 0) {
       setErrors(validateErrors);
       return;
+    } else {
+      setErrors({});
     }
 
-    console.log("Tudo ok", data);
-
-    if (data) {
-      FormService.addForm(data)
-        .then((result) => {
-          setName("");
-          setEmail("");
-          setAgree(false);
-          console.log("Dados enviados com sucesso", result);
-          setResponse(result);
-        })
-        .catch((error) => {
-          setName("");
-          setEmail("");
-          setAgree(false);
-          console.log("houve um erro", error);
-        });
-    }
+    onSubmit(formData);
   };
+
   return {
+    formData,
     errors,
     response,
-    name,
-    setName,
-    email,
-    setEmail,
-    agree,
-    setAgree,
+    handleChange,
     handleSubmit,
   };
-}
+};
 
 export default useForm;
