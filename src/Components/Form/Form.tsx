@@ -1,54 +1,18 @@
-import { FormEvent, useState } from "react";
-import { IUser } from "../../Interfaces";
-import FormService from "../../Services/Form/FormService";
-import { ValidateForm } from "../../Utils/ValidateForm";
+import { Button } from "../Button/Button";
+import useForm from "./useForm";
 
 function Form() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [agree, setAgree] = useState(false);
-
-  const [errors, setErrors] = useState<IUser | null>(null);
-
-  const [response, setResponse] = useState<IUser | null>(null);
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-
-    setErrors(null);
-
-    const data: IUser = {
-      name,
-      email,
-      agree,
-    };
-
-    const validateErrors = ValidateForm(data);
-
-    if (Object.keys(validateErrors).length > 0) {
-      setErrors(validateErrors);
-      return;
-    }
-
-    console.log("Tudo ok", data);
-
-    if (data) {
-      FormService.addForm(data)
-        .then((result) => {
-          setName("");
-          setEmail("");
-          setAgree(false);
-          console.log("Dados enviados com sucesso", result);
-          setResponse(result);
-        })
-        .catch((error) => {
-          setName("");
-          setEmail("");
-          setAgree(false);
-          console.log("houve um erro", error);
-        });
-    }
-  };
+  const {
+    errors,
+    response,
+    name,
+    setName,
+    email,
+    setEmail,
+    agree,
+    setAgree,
+    handleSubmit,
+  } = useForm();
 
   return (
     <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
@@ -100,12 +64,13 @@ function Form() {
           <small className="text-xs text-red-500 mt-1">{errors?.agree}</small>
         )}
       </div>
-      <button
+
+      <Button
+        className="bg-slate-600 hover:bg-slate-800 font-medium text-sm py-2 px-4 rounded-lg text-white"
         type="submit"
-        className="bg-slate-600 hover:bg-slate-500 font-medium text-sm py-2 px-4 rounded-lg text-white"
       >
         Cadastrar
-      </button>
+      </Button>
 
       {response && (
         <div className="mt-4 p-4 bg-gray-100 rounded-lg">
